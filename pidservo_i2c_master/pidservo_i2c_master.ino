@@ -33,6 +33,7 @@ int servo_pot_pin = 0;  // analog pin used to connect the potentiometer
 long current_angle = 0; // most recent angle from servo pot
 
 long target = 90000; // in thousanths of a degree
+int led = 13;
 
 #define DO_LOGGING
 
@@ -41,7 +42,7 @@ void setup()
   #ifdef DO_LOGGING
   Serial.begin(9600);
   #endif
-  
+  pinMode(led, OUTPUT); 
   
  Wire.begin(); // start i2c as master
   // Arduino analog input 5 - I2C SCL
@@ -64,13 +65,16 @@ void loop()
   
   //Serial.println ("sent target");
 
-  delay(100);   
   
-  read_current_angle();
+  //read_current_angle();
   
-  Serial.println (current_angle);
+  //Serial.println (current_angle);
   
-  delay(100);   
+  digitalWrite(led, HIGH);  
+  delay(200);              
+  digitalWrite(led, LOW);
+  
+  delay(2000);   // Wait a while so we can see the operation of the servo when undisturbed
   
 } 
 

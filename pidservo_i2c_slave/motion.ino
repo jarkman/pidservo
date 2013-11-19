@@ -5,8 +5,8 @@ float nominal_angle = 90.0;
 
 boolean stop_at_end = true;
 boolean first = true;
+boolean moving  = false;
 
-float last_t = 0.0;
 void motion_setup()
 {
 }
@@ -19,12 +19,12 @@ float motion_loop()
   {
     target = current_angle;
     nominal_angle = current_angle;
-    last_t = millis();
+   
     first = false;
   }
   
   
-   float distance, now;
+   float distance;
   
   float sign = 1.0;
   
@@ -33,24 +33,27 @@ float motion_loop()
   if( distance < 0.0 )
     sign = -1.0;
  
-  now = millis();
  
   if( abs(distance) < 180.0/512.0 ) // arrived
   {
-    //Serial.println(" arrived");
-    last_t = now;
+   #ifdef DO_LOGGING
+    if( moving )
+      Serial.println(" arrived");
+   #endif
+    
+    moving = false;
     return target;
   }
 
  
-  
-  dt =  (now - last_t) / 1000.0;
-  
+ moving = true;
+    
   if( stop_at_end && in_braking_zone(distance) )
   {
     curr_speed -= acceleration * dt * sign;
+    #ifdef DO_LOGGING
     Serial.println(" braking: ");
-    
+    #endif
     /*if( abs(curr_speed) < min_speed )
     {
       curr_speed = min_speed * sign;
@@ -60,7 +63,9 @@ float motion_loop()
   }
   else if( abs(curr_speed) < max_speed )
   {
+    #ifdef DO_LOGGING
     Serial.println(" accelerating: ");
+    #endif
     curr_speed += acceleration * dt * sign;
     
     if( abs(curr_speed) > max_speed )
@@ -71,9 +76,13 @@ float motion_loop()
   }
   else
   {
+    #ifdef DO_LOGGING
     Serial.println(" cruising");
+    #endif
   }
   
+  
+  #ifdef DO_LOGGING
    Serial.print ("target" );
   Serial.print (target);
  
@@ -92,12 +101,14 @@ float motion_loop()
   Serial.print (curr_speed);
   
   Serial.print (" giving: ");
+  #endif
   
   nominal_angle += dt * curr_speed;
   
-
+#ifdef DO_LOGGING
   Serial.print (nominal_angle);
   Serial.println ("");
+  #endif
   
   last_t = now;
   

@@ -129,6 +129,12 @@ void i2CReceiveEvent(int howMany)
       //nothing to do, action continues in i2cRequestEvent
       break;
   }
+  
+  if( target < min_angle )
+    target = min_angle;
+    
+  if( target > max_angle )
+    target = max_angle;
 }
 
 float read_milli_float()
