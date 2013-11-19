@@ -87,8 +87,9 @@ float max_angle = 179;
 float max_speed = 1000.0; 
 float acceleration = 40.0; 
 
-// PID constants
-float Kp = 0.4;
+// PID constants- try 0.6, 0.0, 0.02 as a sensible place to start
+// To get some compliance, try 0.1, 10, 0.02
+float Kp = 0.6;
 float Ki = 0.0;
 float Kd = 0.02;
 

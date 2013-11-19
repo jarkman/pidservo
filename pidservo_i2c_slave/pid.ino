@@ -63,7 +63,7 @@ void pid_loop( float pid_target )
 
   // i term tends to be huge so gets a bigger divisor
   output = (Kp*error) + (Ki*integral)/100.0 + (Kd*derivative);
-  // output is (roughly) in the range -90,000 to 90,000, with 0 when here's no error
+  // output is (roughly) in the range -90 to 90, with 0 when here's no error
   
   previous_error = error;
 
@@ -81,7 +81,8 @@ void pid_loop( float pid_target )
   if( output > max_power )
     output = max_power;
     
-    
+
+      
 #ifdef ATTINY45 
     
     myservo.write( output  + 90.0 );
