@@ -1,7 +1,7 @@
 
 /*
 
-pidservo_i2c_slave
+pidservo_i2c_slaveew
 ===================
 This sketch receives angle instructions over i2c from pidservo_i2c_master, and controls the servo with a PID loop
 
@@ -67,9 +67,9 @@ float acceleration = 40.0;
 
 // PID constants- try 0.6, 0.0, 0.02 as a sensible place to start
 // To get some compliance, try 0.1, 10, 0.02
-float Kp = 0.6;
+float Kp = 0.5;
 float Ki = 0.0;
-float Kd = 0.02;
+float Kd = 0.01;
 
 
 void setup() 
@@ -87,23 +87,27 @@ motion_setup();
  
 void loop() 
 { 
+  i2c_slave_loop();
 
   now = millis();
 
   if( last_t == 0.0 )
-    dt = loop_delay; // stop us genreating loopy numbers first time round
-  else  
+    last_t = now; // stop us genreating loopy numbers first time round
+  
+  if( now - last_t > (int) (loop_delay * 1000.0)) // no point going round too often, since our output is a servo pulse every 20ms
+  {
     dt = (now - last_t) / 1000.0;
   
   pid_read_angle();
   
    float pid_target = motion_loop(); // Motion control generates a desired position right now
   
-   //pid_loop( pid_target ); // and we ask the pid to get us to that position
+   pid_loop( pid_target ); // and we ask the pid to get us to that position
   
-  delay( (int) (loop_delay * 1000.0) );  // no point going round too often, since our output is a servo pulse every 20ms
+  
   
   last_t = now;
+  }
 } 
 
 

@@ -1,5 +1,9 @@
 
+#define DO_SERVO // just so we can turn the servo code off for debugging purposes
+
+#ifdef DO_SERVO
 #include <SoftwareServo.h> 
+#endif
 
 #ifndef ATTINY
 // must be on a real Arduino,
@@ -9,13 +13,14 @@ int servo_output_pin = 9; // drive signal to the servo
 
 #else
 // ATTiny45 doesn't have A4
-int servo_pot_pin = A2;  // chip pin 3 - analog pin used to connect the potentiometer
+int servo_pot_pin = 2;  // chip pin 3 - analog pin used to connect the potentiometer
 int servo_output_pin = 1; // chip pin 6, PB1 drive signal to the servo
 #endif
 
 
-
+#ifdef DO_SERVO
 SoftwareServo myservo; 
+#endif
 
 // loop state
 float previous_error = 0;
@@ -27,7 +32,10 @@ float integral = 0;
 
 void pid_setup() 
 { 
+  #ifdef DO_SERVO
   myservo.attach(servo_output_pin);  // attaches the servo on pin 9 to the servo object 
+  #endif
+  
 }
 
 void pid_read_angle()
@@ -82,10 +90,13 @@ void pid_loop( float pid_target )
     output = max_power;
     
 
-      
+#ifdef DO_SERVO  
 #ifdef ATTINY
     
+    
     myservo.write( output  + 90.0 );
+    
+     SoftwareServo::refresh();
     
 #else
 // Driving the servo in uS rather than degrees gets round a resolution problem with Arduino Servo.write    
@@ -97,6 +108,7 @@ void pid_loop( float pid_target )
 
   myservo.writeMicroseconds( (int) us ); // 1500 us is about the neutral position
   
+#endif
 #endif
   
 

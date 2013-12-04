@@ -85,7 +85,7 @@ float min_angle = 1; // soft endstops
 float max_angle = 179; 
 
 float max_speed = 1000.0; 
-float acceleration = 40.0; 
+float acceleration = 80.0; 
 
 // PID constants- try 0.6, 0.0, 0.02 as a sensible place to start
 // To get some compliance, try 0.1, 10, 0.02

@@ -10,7 +10,15 @@
 #endif
 
 
+#ifndef ATTINY
+// must be on a real Arduino,
+int led_pin = 3;  
+#else
+int led_pin = 3;    // chip pin 2 - pin for status led
+#endif
+
 char last_command = '\0';
+boolean led_state = false;
 
 
 float read_milli_float();
@@ -18,7 +26,14 @@ long read_4_bytes();
 
 void i2c_slave_setup() 
 { 
-
+ pinMode(led_pin, OUTPUT); 
+ 
+ toggle_led();
+ delay(1000);
+ toggle_led();
+  delay(1000);
+ toggle_led();
+ 
 #ifdef DO_LOGGING
   Serial.print ("Wire.begin\n");
 #endif
@@ -36,6 +51,16 @@ void i2c_slave_setup()
 } 
 
 
+
+void i2c_slave_loop()
+{
+    /**
+     * This is the only way we can detect stop condition (http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&p=984716&sid=82e9dc7299a8243b86cf7969dd41b5b5#984716)
+     * it needs to be called in a very tight loop in order not to miss any (REMINDER: Do *not* use delay() anywhere, use tws_delay() instead).
+     * It will call the function registered via TinyWireS.onReceive(); if there is data in the buffer on stop.
+     */
+    TinyWireS_stop_check();
+}
  #ifdef DO_I2C
  
  
@@ -76,6 +101,17 @@ void i2cRequestEvent() // called when master asks for bytes
 
 }
 
+void toggle_led()
+{
+    led_state = ! led_state;
+  
+  if( led_state )
+    digitalWrite(led_pin, HIGH);   
+  else          
+    digitalWrite(led_pin, LOW); 
+  
+}
+
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void i2CReceiveEvent(uint8_t howMany)
@@ -85,6 +121,8 @@ void i2CReceiveEvent(uint8_t howMany)
   //Serial.println(howMany);
 #endif
 
+  toggle_led();
+  
   if( TinyWireS.available() < 1)
     return;
     
